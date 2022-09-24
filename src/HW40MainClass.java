@@ -8,6 +8,7 @@ public class HW40MainClass {
         FileOutputStream output = null;
         try {
             // TASK 1
+            System.out.println("Task #1");
             // Path to file
             System.out.println(System.getProperty("user.dir") + File.separator + "Test1.txt\nRequired file path is above (just copy that):");
             String path = reader.readLine();
@@ -51,10 +52,12 @@ public class HW40MainClass {
             }
             // Showing & counting
             System.out.println(wordsFromFile);
-            System.out.println("Provided word was found " + counter + " times.");
+            System.out.println("Provided word was found " + counter + " time(s).");
+            System.out.println();
 
 
             // TASK 2
+            System.out.println("Task #2");
             // Getting a new word as substitution and inserting it
             System.out.println("Enter a word which will substitute the one you had provided earlier:");
             String wordForChange = reader.readLine();
@@ -66,29 +69,41 @@ public class HW40MainClass {
                 }
             }
             System.out.println(wordsWithSubstitution);
+            System.out.println();
 
 
             // TASK 3
+            System.out.println("Task #3");
             // Collecting prohibited words
             System.out.println("Feel yourself a soviet censor! Let's ban some words! How many?");
             int bannedAmount = Integer.parseInt(reader.readLine());
-            ArrayList<String> bannedWords = new ArrayList<>(bannedAmount);
+            LinkedHashMap<String, Integer> bannedWords = new LinkedHashMap<>(bannedAmount);
             for (int i = 0; i < bannedAmount; i++) {
                 System.out.println("Provide a word, comrade:");
-                bannedWords.add(reader.readLine());
+                bannedWords.put(reader.readLine().toLowerCase(), 0);
             }
             // Writing the new text to another file
             output = new FileOutputStream(System.getProperty("user.dir") + File.separator + "Test2.txt");
             ArrayList<String> wordsWithoutBanned = new ArrayList<>(wordsFromFile);
-            for (int i = 0; i < wordsWithoutBanned.size(); i++) {
-                for (int j = 0; j < bannedWords.size(); j++) {
-                    if (wordsWithoutBanned.get(i).equals(bannedWords.get(j)) || wordsWithoutBanned.get(i).equalsIgnoreCase(bannedWords.get(j))) {
+            FileOutputStream finalOutput = output;
+            bannedWords.entrySet().forEach(x -> {
+                for (int i = 0; i < wordsWithoutBanned.size(); i++) {
+                    if (x.getKey().equals(wordsWithoutBanned.get(i)) || x.getKey().equalsIgnoreCase(wordsWithoutBanned.get(i))) {
+                        x.setValue(x.getValue() + 1);
                         wordsWithoutBanned.remove(i);
-                        i = 0;
+                    } else {
+                        try {
+                            finalOutput.write((wordsWithoutBanned.get(i) + " ").getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-                output.write(((wordsWithoutBanned.get(i)) + " ").getBytes());
-            }
+
+            });
+            bannedWords.entrySet().forEach(x -> {
+                System.out.println("\"" + x.getKey() + "\"" + " was found " + x.getValue() + " time(s).");
+            });
             System.out.println(wordsWithoutBanned);
             // Catching exceptions & closing file streams
         } catch (IOException exception) {}
